@@ -1,4 +1,3 @@
-// DaDataAddressCleanerApplication.java
 package com.example.runorn_dadata_demo;
 
 import org.springframework.boot.SpringApplication;
