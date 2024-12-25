@@ -1,0 +1,4 @@
+spring.application.name=runorn-dadata-demo
+server.port=8080
+dadata.token=
+dadata.secret_token=
