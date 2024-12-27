@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/address")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AddressController {
   private final DaDataService daDataService;
@@ -17,7 +18,11 @@ public class AddressController {
   @PostMapping("/clean")
   public AddressResponse cleanAddress(@RequestBody AddressRequestDto requestDto) {
     System.out.println(requestDto);
-    return daDataService.cleanAddress("СТРОКА-ШАБЛОН. ДОБАВИТЬ СТРОКУ ИЗ объекта");
+    return daDataService.cleanAddress(requestDto.getCity() +
+        " " +
+        requestDto.getStreet() +
+        " " +
+        requestDto.getApartment());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)

@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -49,7 +50,8 @@ public class DaDataService {
         .uri("")
         .header("Authorization", "Token " + token)
         .header("X-Secret",  secretToken)
-        .body(BodyInserters.fromValue(List.of("мск сухонска 11/-89")))
+        .acceptCharset(StandardCharsets.UTF_8)
+        .body(BodyInserters.fromValue(List.of(address)))
         .retrieve()
         .bodyToFlux(AddressResponse.class)
         .collectList()
