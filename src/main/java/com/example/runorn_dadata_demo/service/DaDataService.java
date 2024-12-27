@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
@@ -41,13 +42,14 @@ public class DaDataService {
         .filter(logRequest())
         .defaultHeader("Content-Type", "application/json")
         .defaultHeader("Accept", "application/json")
-        .baseUrl(CLEANER_URI)
         .build();
   }
 
   public AddressResponse cleanAddress(String address) {
     return webClient.post()
-        .uri("")
+        .uri(UriComponentsBuilder.fromUriString(CLEANER_URI)
+            .build()
+            .toUri())
         .header("Authorization", "Token " + token)
         .header("X-Secret",  secretToken)
         .acceptCharset(StandardCharsets.UTF_8)
