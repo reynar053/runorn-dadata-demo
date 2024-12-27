@@ -1,23 +1,19 @@
-package com.example.runorn_dadata_demo;
+package com.example.runorn_dadata_demo.service;
 
-import com.example.runorn_dadata_demo.model.AddressRequest;
+import com.example.runorn_dadata_demo.model.AddressRequestDto;
 import com.example.runorn_dadata_demo.model.AddressResponse;
 import io.netty.handler.logging.LogLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -29,21 +25,22 @@ public class DaDataService {
   private String token;
   @Value("${dadata.secret_token}")
   private String secretToken;
+  @Value("${dadata.clean.address}")
+  private String POSTAL_URI;
+  @Value("${dadata.postal.address}")
+  private String CLEANER_URI;
 
   public DaDataService(WebClient.Builder webClientBuilder) {
     HttpClient httpClient = HttpClient.create()
         .wiretap(this.getClass().getCanonicalName(), LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
     ClientHttpConnector conn = new ReactorClientHttpConnector(httpClient);
 
-    String postalUri = "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/postal_unit";
-    String cleanerUri = "https://cleaner.dadata.ru/api/v1/clean/address";
-
     this.webClient = webClientBuilder
         .clientConnector(conn)
         .filter(logRequest())
         .defaultHeader("Content-Type", "application/json")
         .defaultHeader("Accept", "application/json")
-        .baseUrl(cleanerUri)
+        .baseUrl(CLEANER_URI)
         .build();
   }
 
@@ -52,13 +49,17 @@ public class DaDataService {
         .uri("")
         .header("Authorization", "Token " + token)
         .header("X-Secret",  secretToken)
-        .acceptCharset(StandardCharsets.UTF_8)
         .body(BodyInserters.fromValue(List.of("мск сухонска 11/-89")))
         .retrieve()
         .bodyToFlux(AddressResponse.class)
         .collectList()
         .block()
         .get(0);
+  }
+
+  // TODO: реализовать этот метод, мб вынести в отдельный сервис
+  public AddressResponse getPostalAddress(AddressRequestDto requestDto) {
+    return null;
   }
 
   private ExchangeFilterFunction logRequest() {

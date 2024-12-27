@@ -1,4 +1,9 @@
 spring.application.name=runorn-dadata-demo
 server.port=8080
+logging.level.web=DEBUG
+logging.charset.console=UTF-8
+
 dadata.token=
 dadata.secret_token=
+dadata.clean.address=https://cleaner.dadata.ru/api/v1/clean/address
+dadata.postal.address=http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/postal_unit
