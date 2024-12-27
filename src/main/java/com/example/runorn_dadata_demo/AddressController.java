@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/address")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AddressController {
   private final DaDataService daDataService;
