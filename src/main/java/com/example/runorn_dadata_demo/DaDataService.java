@@ -53,7 +53,7 @@ public class DaDataService {
         .header("Authorization", "Token " + token)
         .header("X-Secret",  secretToken)
         .acceptCharset(StandardCharsets.UTF_8)
-        .body(BodyInserters.fromValue(List.of("мск сухонска 11/-89")))
+        .body(BodyInserters.fromValue(List.of(address)))
         .retrieve()
         .bodyToFlux(AddressResponse.class)
         .collectList()
