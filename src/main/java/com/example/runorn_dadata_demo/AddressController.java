@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class AddressController {
   private final DaDataService daDataService;
 
+
   @PostMapping("/clean")
   public AddressResponse cleanAddress(@RequestBody AddressRequestDto requestDto) {
     System.out.println(requestDto);
-    return daDataService.cleanAddress("СТРОКА-ШАБЛОН. ДОБАВИТЬ СТРОКУ ИЗ объекта");
+    return daDataService.cleanAddress(requestDto.getCity() + " " + requestDto.getStreet() + " " + requestDto.getApartment());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
