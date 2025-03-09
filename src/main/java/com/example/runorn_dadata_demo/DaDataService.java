@@ -44,17 +44,22 @@ public class DaDataService {
   }
 
   public AddressResponse cleanAddress(String address) {
-    return webClient.post()
-        .uri("")
-        .header("Authorization", "Token " + token)
-        .header("X-Secret",  secretToken)
-        .acceptCharset(StandardCharsets.UTF_8)
-        .body(BodyInserters.fromValue(List.of(address)))
-        .retrieve()
-        .bodyToFlux(AddressResponse.class)
-        .collectList()
-        .block()
-        .get(0);
+    List<AddressResponse> pivo;
+
+      pivo = webClient.post()
+          .uri("")
+          .header("Authorization", "Token " + token)
+          .header("X-Secret", secretToken)
+          .acceptCharset(StandardCharsets.UTF_8)
+          .body(BodyInserters.fromValue(List.of(address)))
+          .retrieve()
+          .bodyToFlux(AddressResponse.class)
+          .collectList()
+          .block();
+    if (pivo == null || pivo.isEmpty()) {
+      throw new NullPointerException("Список пустой :(");
+    }
+    return pivo.get(0);
   }
 
   private ExchangeFilterFunction logRequest() {
