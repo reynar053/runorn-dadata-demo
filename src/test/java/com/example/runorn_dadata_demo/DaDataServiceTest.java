@@ -30,8 +30,6 @@ public class DaDataServiceTest {
   @Mock
   private AddressSaverImpl addressSaverImpl;
   @Mock
-  private WebClient.Builder webClient;
-  @Mock
   private DaDataClient daDataClient;
 
   @BeforeEach
