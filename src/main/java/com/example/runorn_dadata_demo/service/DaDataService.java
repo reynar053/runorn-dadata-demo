@@ -28,7 +28,7 @@ public class DaDataService {
 
     addressResponseList = daDataClient.sendRequest(address);
     log.info("{} PIVO",addressResponseList.toString());
-    if (addressResponseList == null || addressResponseList.isEmpty()) {
+    if (addressResponseList.isEmpty()) {
       throw new NullPointerException("Список пустой :(");
     }
     addressStorage.saveAddress(addressResponseList);
