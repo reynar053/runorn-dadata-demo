@@ -16,7 +16,6 @@ public class DaDataService {
   private final AddressSaver addressStorage;
 
 
-
   public DaDataService(AddressSaverImpl addressSaverImpl, DaDataClient daDataClient) {
     this.addressStorage = addressSaverImpl;
     this.daDataClient = daDataClient;
@@ -25,17 +24,16 @@ public class DaDataService {
 
   public AddressResponse cleanAddress(String address) {
     List<AddressResponse> addressResponseList;
-
     addressResponseList = daDataClient.sendRequest(address);
     log.info("{} PIVO",addressResponseList.toString());
     if (addressResponseList.isEmpty()) {
       throw new NullPointerException("Список пустой :(");
     }
-    addressStorage.saveAddress(addressResponseList);
+    addressStorage.saveFirstAddress(addressResponseList);
     return addressResponseList.get(0);
   }
 
-
-
-
+  public AddressResponse getAddressById(int id) {
+    return addressStorage.getAddressById(id);
+  }
 }
