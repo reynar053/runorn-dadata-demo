@@ -21,15 +21,15 @@ public class AddressSaverImplTest {
   private AddressResponse addressResponse;
 
   @Test
-  void saveAddressTest() {
+  void saveFirstAddressTest() {
     List<AddressResponse> addressResponseList = List.of(addressResponse);
-    addressSaver.saveAddress(addressResponseList);
-    assertEquals(1, addressSaver.getAddressesList().size());
+    addressSaver.saveFirstAddress(addressResponseList);
+    assertEquals(addressResponse, addressSaver.getAddressById(1));
   }
 
   @Test
-  void saveAddressTestFail(){
-    assertThrows(NullPointerException.class,
-        () -> addressSaver.saveAddress(null));
+  void saveFirstAddressTestFail(){
+    AddressResponse result = addressSaver.getAddressById(999);
+    assertNull(result);
   }
 }
