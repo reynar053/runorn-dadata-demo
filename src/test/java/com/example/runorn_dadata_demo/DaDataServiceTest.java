@@ -67,7 +67,7 @@ public class DaDataServiceTest {
     List<AddressResponse> emptyList = Collections.emptyList();
     when(daDataClient.sendRequest(anyString())).thenReturn(emptyList);
 
-    NullPointerException exception = assertThrows(NullPointerException.class, () -> {daDataService.cleanAddress("мск сухонска 11 89");});
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> daDataService.cleanAddress("мск сухонска 11 89"));
     assertEquals("Список пустой :(", exception.getMessage());
   }
 
