@@ -5,5 +5,6 @@ import com.example.runorn_dadata_demo.model.AddressResponse;
 import java.util.List;
 
 public interface AddressSaver {
-  void saveAddress(List<AddressResponse> addresses);
+  void saveFirstAddress(List<AddressResponse> addresses);
+  AddressResponse getAddressById(int id);
 }
