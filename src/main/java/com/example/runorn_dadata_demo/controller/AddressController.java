@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class AddressController {
   private final DaDataService daDataService;
 
-  public final AddressSaverImpl addressSaver;
-
-
-
   @PostMapping("/clean")
   public AddressResponse cleanAddress(@RequestBody AddressRequestDto requestDto) {
     System.out.println(requestDto);
@@ -39,6 +35,6 @@ public class AddressController {
 
   @GetMapping
   public AddressResponse getAddressById(@RequestParam int id) {
-    return addressSaver.getAddressById(id);
+    return daDataService.getAddressById(id);
   }
 }
