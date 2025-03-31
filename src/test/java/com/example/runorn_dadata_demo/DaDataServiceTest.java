@@ -2,6 +2,9 @@ package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.http.DaDataClient;
 import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.AddressResponseDto;
+import com.example.runorn_dadata_demo.model.AddressResponseMapper;
+import com.example.runorn_dadata_demo.repository.AddressSaver;
 import com.example.runorn_dadata_demo.repository.AddressSaverImpl;
 import com.example.runorn_dadata_demo.service.DaDataService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,11 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +33,9 @@ public class DaDataServiceTest {
   private AddressSaverImpl addressSaverImpl;
   @Mock
   private DaDataClient daDataClient;
+
+  @Mock
+  private AddressResponse addressResponse;
 
   @BeforeEach
   void setUp() {
@@ -62,8 +68,9 @@ public class DaDataServiceTest {
 
     verify(addressSaverImpl).saveFirstAddress(any());
   }
+
   @Test
-  void cleanAddressTestError(){
+  void cleanAddressTestError() {
     List<AddressResponse> emptyList = Collections.emptyList();
     when(daDataClient.sendRequest(anyString())).thenReturn(emptyList);
 
@@ -71,5 +78,26 @@ public class DaDataServiceTest {
     assertEquals("Список пустой :(", exception.getMessage());
   }
 
+  @Test
+  void getAddressByIdTest() {
+    AddressResponseDto expectedDto = AddressResponseMapper.toDto(addressResponse);
 
+    when(addressSaverImpl.getAddressById(1)).thenReturn(Optional.of(addressResponse));
+    AddressResponseDto result = daDataService.getAddressById(1);
+
+    assertNotNull(result);
+    assertEquals(expectedDto, result);
+    verify(addressSaverImpl, times(1)).getAddressById(1);
+  }
+
+  @Test
+  void getAddressByIdTestError() {
+    when(addressSaverImpl.getAddressById(999)).thenReturn(Optional.empty());
+
+    RuntimeException exception = assertThrows(RuntimeException.class,
+        () -> daDataService.getAddressById(999));
+
+    assertEquals("Значение не найдено!", exception.getMessage());
+    verify(addressSaverImpl, times(1)).getAddressById(999);
+  }
 }

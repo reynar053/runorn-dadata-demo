@@ -19,7 +19,5 @@ public class AddressResponse {
   private String regionType;
   @JsonProperty
   private String qc;
-
-
 }
 

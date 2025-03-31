@@ -1,6 +1,7 @@
 package com.example.runorn_dadata_demo.controller;
 
 
+import com.example.runorn_dadata_demo.model.AddressResponseDto;
 import com.example.runorn_dadata_demo.service.DaDataService;
 import com.example.runorn_dadata_demo.model.AddressRequestDto;
 import com.example.runorn_dadata_demo.model.AddressResponse;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @RestController
@@ -34,7 +36,7 @@ public class AddressController {
   }
 
   @GetMapping
-  public AddressResponse getAddressById(@RequestParam int id) {
+  public AddressResponseDto getAddressById(@RequestParam int id) {
     return daDataService.getAddressById(id);
   }
 }

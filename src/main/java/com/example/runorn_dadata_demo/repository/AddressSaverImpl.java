@@ -7,25 +7,28 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Component
 @Slf4j
 public class AddressSaverImpl implements AddressSaver {
-  private final Map<Integer, AddressResponse> addressMap = new HashMap<>();
-  private int id = 0;
+  private Map<Integer, AddressResponse> addressMap = new HashMap<>();
+  private AtomicInteger idGenerator = new AtomicInteger(1);
 
 
   @Override
   public void saveFirstAddress(List<AddressResponse> addresses) {
-   AddressResponse address = addresses.get(0);
-   id++;
-   log.info("{} addresses saved", address);
-   addressMap.put(id, address);
+    AddressResponse address = addresses.get(0);
+    int id = idGenerator.getAndIncrement();
+    log.info("{} addresses saved", address);
+    addressMap.put(id, address);
   }
 
-@Override
-  public AddressResponse getAddressById(int id) {
-    return addressMap.get(id);
+  @Override
+  public Optional<AddressResponse> getAddressById(int id) {
+    Optional<AddressResponse> adressOpt = Optional.ofNullable(addressMap.get(id));
+    return adressOpt;
   }
 }
