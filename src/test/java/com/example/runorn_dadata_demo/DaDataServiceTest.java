@@ -4,7 +4,6 @@ import com.example.runorn_dadata_demo.http.DaDataClient;
 import com.example.runorn_dadata_demo.model.AddressResponse;
 import com.example.runorn_dadata_demo.model.AddressResponseDto;
 import com.example.runorn_dadata_demo.model.AddressResponseMapper;
-import com.example.runorn_dadata_demo.repository.AddressSaver;
 import com.example.runorn_dadata_demo.repository.AddressSaverImpl;
 import com.example.runorn_dadata_demo.service.DaDataService;
 import org.junit.jupiter.api.BeforeEach;

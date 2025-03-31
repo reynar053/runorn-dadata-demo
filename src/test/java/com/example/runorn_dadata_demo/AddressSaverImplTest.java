@@ -1,7 +1,6 @@
 package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.model.AddressResponse;
-import com.example.runorn_dadata_demo.model.AddressResponseDto;
 import com.example.runorn_dadata_demo.repository.AddressSaverImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

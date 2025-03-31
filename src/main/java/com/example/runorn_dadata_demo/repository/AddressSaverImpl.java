@@ -28,7 +28,6 @@ public class AddressSaverImpl implements AddressSaver {
 
   @Override
   public Optional<AddressResponse> getAddressById(int id) {
-    Optional<AddressResponse> adressOpt = Optional.ofNullable(addressMap.get(id));
-    return adressOpt;
+    return Optional.ofNullable(addressMap.get(id));
   }
 }
