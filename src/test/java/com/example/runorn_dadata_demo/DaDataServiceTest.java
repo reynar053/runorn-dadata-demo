@@ -33,9 +33,6 @@ public class DaDataServiceTest {
   @Mock
   private DaDataClient daDataClient;
 
-  @Mock
-  private AddressResponse addressResponse;
-
   @BeforeEach
   void setUp() {
 
@@ -79,6 +76,7 @@ public class DaDataServiceTest {
 
   @Test
   void getAddressByIdTest() {
+    AddressResponse addressResponse = new AddressResponse();
     AddressResponseDto expectedDto = AddressResponseMapper.toDto(addressResponse);
 
     when(addressSaverImpl.getAddressById(1)).thenReturn(Optional.of(addressResponse));

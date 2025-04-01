@@ -16,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -85,10 +89,12 @@ class AddressControllerTest {
   }
 
   @Test
-  void getAddressByIdErrorTest() {
-    when(daDataService.getAddressById(999)).thenReturn(null);
-    AddressResponseDto testShortResponse = addressController.getAddressById(999);
-    assertNull(testShortResponse);
-    verify(daDataService, times(1)).getAddressById(999);
+  void getAddressByIdTestError() {
+    when(addressController.getAddressById(999)).thenThrow(new RuntimeException("Значение не найдено!"));
+
+    RuntimeException exception = assertThrows(RuntimeException.class,
+        () -> addressController.getAddressById(999));
+
+    assertEquals("Значение не найдено!", exception.getMessage());
   }
 }
