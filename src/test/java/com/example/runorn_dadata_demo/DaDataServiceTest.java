@@ -1,10 +1,11 @@
 package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.http.DaDataClient;
+import com.example.runorn_dadata_demo.model.Address;
 import com.example.runorn_dadata_demo.model.AddressResponse;
 import com.example.runorn_dadata_demo.model.AddressResponseDto;
 import com.example.runorn_dadata_demo.model.AddressResponseMapper;
-import com.example.runorn_dadata_demo.repository.AddressSaverImpl;
+import com.example.runorn_dadata_demo.repository.AddressSaverDBImpl;
 import com.example.runorn_dadata_demo.service.DaDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class DaDataServiceTest {
   @InjectMocks
   private DaDataService daDataService;
   @Mock
-  private AddressSaverImpl addressSaverImpl;
+  private AddressSaverDBImpl addressSaverDBImpl;
   @Mock
   private DaDataClient daDataClient;
 
@@ -53,7 +54,7 @@ public class DaDataServiceTest {
 
     when(daDataClient.sendRequest(anyString())).thenReturn(addressResponsesList);
 
-    AddressResponse result = daDataService.cleanAddress("мск сухонска 11 89");
+    AddressResponse result = daDataService.cleanAddress("мск сухонска 11 89", "pivo");
     assertNotNull(result);
     assertEquals("мск сухонска 11 89", result.getSource());
     assertEquals("Россия", result.getCountry());
@@ -62,7 +63,7 @@ public class DaDataServiceTest {
     assertEquals("г", result.getRegionType());
     assertEquals("0", result.getQc());
 
-    verify(addressSaverImpl).saveFirstAddress(any());
+    verify(addressSaverDBImpl).saveFirstAddress(any(),any());
   }
 
   @Test
@@ -70,31 +71,31 @@ public class DaDataServiceTest {
     List<AddressResponse> emptyList = Collections.emptyList();
     when(daDataClient.sendRequest(anyString())).thenReturn(emptyList);
 
-    NullPointerException exception = assertThrows(NullPointerException.class, () -> daDataService.cleanAddress("мск сухонска 11 89"));
+    NullPointerException exception = assertThrows(NullPointerException.class, () -> daDataService.cleanAddress("мск сухонска 11 89", "pivo"));
     assertEquals("Список пустой :(", exception.getMessage());
   }
 
   @Test
-  void getAddressByIdTest() {
-    AddressResponse addressResponse = new AddressResponse();
+  void getAddressByIdTest() throws Throwable {
+    Address addressResponse = new Address();
     AddressResponseDto expectedDto = AddressResponseMapper.toDto(addressResponse);
 
-    when(addressSaverImpl.getAddressById(1)).thenReturn(Optional.of(addressResponse));
-    AddressResponseDto result = daDataService.getAddressById(1);
+    when(addressSaverDBImpl.getAddressById(1L)).thenReturn(Optional.of(addressResponse));
+    AddressResponseDto result = daDataService.getAddressById(1L);
 
     assertNotNull(result);
     assertEquals(expectedDto, result);
-    verify(addressSaverImpl, times(1)).getAddressById(1);
+    verify(addressSaverDBImpl, times(1)).getAddressById(1L);
   }
 
   @Test
   void getAddressByIdTestError() {
-    when(addressSaverImpl.getAddressById(999)).thenReturn(Optional.empty());
+    when(addressSaverDBImpl.getAddressById(999L)).thenReturn(Optional.empty());
 
     RuntimeException exception = assertThrows(RuntimeException.class,
-        () -> daDataService.getAddressById(999));
+        () -> daDataService.getAddressById(999L));
 
     assertEquals("Значение не найдено!", exception.getMessage());
-    verify(addressSaverImpl, times(1)).getAddressById(999);
+    verify(addressSaverDBImpl, times(1)).getAddressById(999L);
   }
 }

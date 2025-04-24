@@ -20,9 +20,9 @@ public class AddressController {
   private final DaDataService daDataService;
 
   @PostMapping("/clean")
-  public AddressResponse cleanAddress(@RequestBody AddressRequestDto requestDto) {
+  public AddressResponse cleanAddress(@RequestHeader("X-User-Login") String login,@RequestBody AddressRequestDto requestDto) {
     System.out.println(requestDto);
-    return daDataService.cleanAddress(requestDto.getCity() + " " + requestDto.getStreet() + " " + requestDto.getApartment());
+    return daDataService.cleanAddress(requestDto.getCity() + " " + requestDto.getStreet() + " " + requestDto.getApartment(), login);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
@@ -36,7 +36,7 @@ public class AddressController {
   }
 
   @GetMapping
-  public AddressResponseDto getAddressById(@RequestParam int id) {
+  public AddressResponseDto getAddressById(@RequestParam Long id) throws Throwable {
     return daDataService.getAddressById(id);
   }
 }

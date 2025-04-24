@@ -33,10 +33,10 @@ public class UserControllerTest {
   MockMvc mockMvc;
 
   @MockBean
-  private UserService userService;  // Мокаем сервис
+  private UserService userService;
 
   @Mock
-  private UserRepository userRepository;  // Мокаем репозиторий
+  private UserRepository userRepository;
 
   @Test
   public void createUser_shouldReturnCreatedUser() throws Exception {
@@ -50,7 +50,7 @@ public class UserControllerTest {
     mockMvc.perform(post("/api/users")
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"login\":\"testUser\", \"created\":\"" + LocalDate.now() + "\"}"))
-        .andExpect(status().isCreated())  // Ожидаем статус 201 CREATED
+        .andExpect(status().isCreated())
         .andExpect(jsonPath("$.login").value("testUser"));
   }
 

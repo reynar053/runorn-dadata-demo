@@ -25,23 +25,24 @@ public class AddressSaverImplTest {
   private AddressResponse addressResponse;
 
   @Spy
-  private Map<Integer, AddressResponse> addressMap = new HashMap<>();
+  private Map<Long, AddressResponse> addressMap = new HashMap<>();
 
   @Test
   void saveFirstAddressTest() {
     List<AddressResponse> addressResponseList = List.of(addressResponse);
-    addressSaver.saveFirstAddress(addressResponseList);
+    addressSaver.saveFirstAddress(addressResponseList, "");
     assertEquals(1, addressMap.size());
   }
 
   @Test
   void saveFirstAddressTestFail() {
     List<AddressResponse> emptyList = List.of();
-    assertThrows(IndexOutOfBoundsException.class, () -> addressSaver.saveFirstAddress(emptyList));
+    assertThrows(IndexOutOfBoundsException.class, () -> addressSaver.saveFirstAddress(emptyList, ""));
   }
 
   @Test
   void getAddressById_shouldReturnShortResponseForExistingId() {
+    String testLogin = "testLogin";
     AddressResponse address = new AddressResponse();
     address.setSource("мск сухонска 11 89");
     address.setCountry("Россия");
@@ -50,9 +51,9 @@ public class AddressSaverImplTest {
     address.setRegionType("г");
     address.setQc("0");
     List<AddressResponse> addressResponsesList = List.of(address);
-    addressSaver.saveFirstAddress(addressResponsesList);
+    addressSaver.saveFirstAddress(addressResponsesList, testLogin);
 
-    Optional<AddressResponse> result = addressSaver.getAddressById(1);
+    Optional<AddressResponse> result = addressSaver.getAddressById(1L);
 
     assertTrue(result.isPresent());
     assertEquals("мск сухонска 11 89", result.get().getSource());

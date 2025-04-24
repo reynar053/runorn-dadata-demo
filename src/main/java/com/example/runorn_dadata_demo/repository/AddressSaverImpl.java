@@ -14,20 +14,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Slf4j
 public class AddressSaverImpl implements AddressSaver {
-  private Map<Integer, AddressResponse> addressMap = new HashMap<>();
+  private Map<Long, AddressResponse> addressMap = new HashMap<>();
   private AtomicInteger idGenerator = new AtomicInteger(1);
 
 
   @Override
-  public void saveFirstAddress(List<AddressResponse> addresses) {
+  public void saveFirstAddress(List<AddressResponse> addresses, String login) {
     AddressResponse address = addresses.get(0);
-    int id = idGenerator.getAndIncrement();
+    Long id = (long) idGenerator.getAndIncrement();
     log.info("{} addresses saved", address);
     addressMap.put(id, address);
   }
 
   @Override
-  public Optional<AddressResponse> getAddressById(int id) {
+  public Optional<AddressResponse> getAddressById(Long id) {
     return Optional.ofNullable(addressMap.get(id));
   }
 }

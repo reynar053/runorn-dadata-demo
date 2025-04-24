@@ -1,18 +1,18 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.Address;
 import com.example.runorn_dadata_demo.model.AddressResponseDto;
 import com.example.runorn_dadata_demo.model.AddressResponseMapper;
 import org.junit.jupiter.api.Test;
 
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AddressResponseMapperTest {
 
   @Test
   void toDto_shouldMapAllFieldsCorrectly() {
-    AddressResponse address = new AddressResponse();
+    Address address = new Address();
     address.setSource("мск сухонска 11 89");
     address.setCountry("Россия");
     address.setPostalCode("127642");
