@@ -1,36 +1,32 @@
-package com.example.runorn_dadata_demo;
+package com.example.runorn_dadata_demo.http;
 
-import com.example.runorn_dadata_demo.model.AddressRequest;
-import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import io.netty.handler.logging.LogLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
+@Component
 @Slf4j
-@Service
-public class DaDataService {
-  private final WebClient webClient;
+public class DaDataClient {
 
   @Value("${dadata.token}")
   private String token;
   @Value("${dadata.secret_token}")
   private String secretToken;
 
-  public DaDataService(WebClient.Builder webClientBuilder) {
+  private final WebClient webClient;
+  public DaDataClient(WebClient.Builder webClientBuilder) {
     HttpClient httpClient = HttpClient.create()
         .wiretap(this.getClass().getCanonicalName(), LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
     ClientHttpConnector conn = new ReactorClientHttpConnector(httpClient);
@@ -46,21 +42,19 @@ public class DaDataService {
         .baseUrl(cleanerUri)
         .build();
   }
+  public List<DaDataApiResponse> sendRequest(String address) {
 
-  public AddressResponse cleanAddress(String address) {
     return webClient.post()
         .uri("")
         .header("Authorization", "Token " + token)
-        .header("X-Secret",  secretToken)
+        .header("X-Secret", secretToken)
         .acceptCharset(StandardCharsets.UTF_8)
-        .body(BodyInserters.fromValue(List.of("мск сухонска 11/-89")))
+        .body(BodyInserters.fromValue(List.of(address)))
         .retrieve()
-        .bodyToFlux(AddressResponse.class)
+        .bodyToFlux(DaDataApiResponse.class)
         .collectList()
-        .block()
-        .get(0);
+        .block();
   }
-
   private ExchangeFilterFunction logRequest() {
     return (clientRequest, next) -> {
       log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
