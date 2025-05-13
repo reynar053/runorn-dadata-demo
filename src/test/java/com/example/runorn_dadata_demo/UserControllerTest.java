@@ -1,6 +1,6 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.User;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.repository.UserRepository;
 import com.example.runorn_dadata_demo.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,7 +40,9 @@ public class UserControllerTest {
 
   @Test
   public void createUser_shouldReturnCreatedUser() throws Exception {
-    User createdUser = new User("testUser", LocalDate.now());
+    User createdUser = new User();
+    createdUser.setLogin("testUser");
+    createdUser.setCreated(LocalDate.now());
     createdUser.setId(1L);
 
     Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(createdUser);
@@ -57,7 +59,9 @@ public class UserControllerTest {
   @Test
   public void getUserById_shouldReturnUser() throws Exception {
     Long id = 1L;
-    User user = new User("testUser", LocalDate.now());
+    User user = new User();
+    user.setLogin("testUser");
+    user.setCreated(LocalDate.now());
     user.setId(id);
 
     Mockito.when(userService.getUserById(id)).thenReturn(user);
@@ -71,7 +75,9 @@ public class UserControllerTest {
   @Test
   public void getUserByLogin_shouldReturnUser() throws Exception {
     String login = "testUser";
-    User user = new User(login, LocalDate.now());
+    User user = new User();
+    user.setLogin(login);
+    user.setCreated(LocalDate.now());
     user.setId(1L);
 
     Mockito.when(userService.getUserByLogin(login)).thenReturn(user);
@@ -83,7 +89,15 @@ public class UserControllerTest {
 
   @Test
   public void getAllUsers_shouldReturnUsersList() throws Exception {
-    List<User> users = Arrays.asList(new User("user1", LocalDate.now()), new User("user2", LocalDate.now()));
+    User user1 = new User();
+    user1.setLogin("user1");
+    user1.setCreated(LocalDate.now());
+    User user2 = new User();
+    user2.setLogin("user2");
+    user2.setCreated(LocalDate.now());
+    List<User> users = new ArrayList<>();
+    users.add(user1);
+    users.add(user2);
 
     Mockito.when(userService.getAllUsers()).thenReturn(users);
 
@@ -95,7 +109,9 @@ public class UserControllerTest {
   @Test
   public void updateUser_shouldReturnUpdatedUser() throws Exception {
     Long userId = 1L;
-    User updatedUser = new User("updatedUser", LocalDate.now());
+    User updatedUser = new User();
+    updatedUser.setLogin("updatedUser");
+    updatedUser.setCreated(LocalDate.now());
     updatedUser.setId(userId);
 
     Mockito.when(userService.updateUser(Mockito.eq(userId), Mockito.anyString())).thenReturn(updatedUser);

@@ -1,6 +1,6 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.User;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.repository.UserRepository;
 import com.example.runorn_dadata_demo.service.UserService;
 import org.junit.jupiter.api.Test;

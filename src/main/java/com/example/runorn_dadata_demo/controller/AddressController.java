@@ -1,10 +1,10 @@
 package com.example.runorn_dadata_demo.controller;
 
 
-import com.example.runorn_dadata_demo.model.AddressResponseDto;
-import com.example.runorn_dadata_demo.service.DaDataService;
-import com.example.runorn_dadata_demo.model.AddressRequestDto;
-import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
+import com.example.runorn_dadata_demo.service.AddressService;
+import com.example.runorn_dadata_demo.model.request.AddressRequestDto;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AddressController {
-  private final DaDataService daDataService;
+  private final AddressService addressService;
 
   @PostMapping("/clean")
-  public AddressResponse cleanAddress(@RequestHeader("X-User-Login") String login,@RequestBody AddressRequestDto requestDto) {
+  public DaDataApiResponse cleanAddress(@RequestHeader("X-User-Login") String login,
+                                        @RequestBody AddressRequestDto requestDto) {
     System.out.println(requestDto);
-    return daDataService.cleanAddress(requestDto.getCity() + " " + requestDto.getStreet() + " " + requestDto.getApartment(), login);
+    return addressService.cleanAddress(requestDto.getCity()
+        + " " + requestDto.getStreet() + " " + requestDto.getApartment(), login);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
@@ -37,6 +39,6 @@ public class AddressController {
 
   @GetMapping
   public AddressResponseDto getAddressById(@RequestParam Long id) throws Throwable {
-    return daDataService.getAddressById(id);
+    return addressService.getAddressById(id);
   }
 }

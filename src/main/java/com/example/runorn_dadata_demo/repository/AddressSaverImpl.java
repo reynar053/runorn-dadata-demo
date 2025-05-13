@@ -1,6 +1,8 @@
 package com.example.runorn_dadata_demo.repository;
 
-import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.entity.User;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -14,20 +16,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Slf4j
 public class AddressSaverImpl implements AddressSaver {
-  private Map<Long, AddressResponse> addressMap = new HashMap<>();
+  private Map<Long, Address> addressMap = new HashMap<>();
   private AtomicInteger idGenerator = new AtomicInteger(1);
 
 
   @Override
-  public void saveFirstAddress(List<AddressResponse> addresses, String login) {
-    AddressResponse address = addresses.get(0);
+  public void saveFirstAddress(Address address) {
     Long id = (long) idGenerator.getAndIncrement();
     log.info("{} addresses saved", address);
     addressMap.put(id, address);
   }
 
   @Override
-  public Optional<AddressResponse> getAddressById(Long id) {
+  public Optional<Address> getAddressById(Long id) {
     return Optional.ofNullable(addressMap.get(id));
   }
 }

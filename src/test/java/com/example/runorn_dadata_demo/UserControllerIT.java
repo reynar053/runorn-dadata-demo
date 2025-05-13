@@ -1,11 +1,12 @@
 package com.example.runorn_dadata_demo;
 
 
-import com.example.runorn_dadata_demo.model.User;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,14 +34,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerIT {
 
   @Container
-   static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:13-alpine")
+  static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:13-alpine")
       .withReuse(true)
       .withDatabaseName("testdb")
       .withUsername("test")
       .withPassword("test")
       .withInitScript("init.sql");
 
-
+  @AfterAll
+  static void tearDown() {
+    container.close();
+  }
 
   @DynamicPropertySource
   static void  configureProperties(DynamicPropertyRegistry registry) {
@@ -62,7 +66,9 @@ public class UserControllerIT {
 
   @Test
   void testCreateAndReadUser() throws Exception {
-    User user = new User("testcontainers", LocalDate.now());
+    User user = new User();
+    user.setLogin("testUser");
+    user.setCreated(LocalDate.now());
     user.setAddresses(Collections.emptyList());
 
     mockMvc.perform(post("/api/users")
@@ -74,8 +80,14 @@ public class UserControllerIT {
 
   @Test
   void testGetAllUsers() throws Exception {
-    repository.save(new User("u1", LocalDate.now(), Collections.emptyList()));
-    repository.save(new User("u2", LocalDate.now(), Collections.emptyList()));
+    User user = new User();
+    user.setLogin("testUser");
+    user.setCreated(LocalDate.now());
+    User user2 = new User();
+    user2.setLogin("testUser2");
+    user2.setCreated(LocalDate.now());
+    repository.save(user);
+    repository.save(user2);
 
     mockMvc.perform(get("/api/users"))
         .andExpect(status().isOk())

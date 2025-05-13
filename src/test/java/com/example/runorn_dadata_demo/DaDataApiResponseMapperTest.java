@@ -1,14 +1,14 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.Address;
-import com.example.runorn_dadata_demo.model.AddressResponseDto;
-import com.example.runorn_dadata_demo.model.AddressResponseMapper;
+import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
+import com.example.runorn_dadata_demo.model.response.AddressResponseMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class AddressResponseMapperTest {
+public class DaDataApiResponseMapperTest {
 
   @Test
   void toDto_shouldMapAllFieldsCorrectly() {

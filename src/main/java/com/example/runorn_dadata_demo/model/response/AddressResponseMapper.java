@@ -1,5 +1,7 @@
-package com.example.runorn_dadata_demo.model;
+package com.example.runorn_dadata_demo.model.response;
 
+
+import com.example.runorn_dadata_demo.model.entity.Address;
 
 public class AddressResponseMapper {
   public static AddressResponseDto toDto(Address address) {

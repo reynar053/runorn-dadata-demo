@@ -18,6 +18,26 @@ CREATE TABLE IF NOT EXISTS kzn.addresses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES kzn.users(id) ON DELETE CASCADE
     );
+CREATE TYPE order_status AS ENUM ('CREATED' ,'PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED');
+
+CREATE TABLE IF NOT EXISTS kzn.orders(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id INT NOT NULL,
+    shipping_address_id INT NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status order_status NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES kzn.users(id) ON DELETE RESTRICT,
+    FOREIGN KEY (shipping_address_id) REFERENCES kzn.addresses(id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS kzn.order_items(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_name VARCHAR(255),
+    quantity INTEGER,
+    price DECIMAL(19, 2),
+    FOREIGN KEY (order_id) REFERENCES kzn.orders(id) ON DELETE CASCADE
+);
 
 GRANT ALL PRIVILEGES ON SCHEMA kzn TO admin;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA kzn TO admin;

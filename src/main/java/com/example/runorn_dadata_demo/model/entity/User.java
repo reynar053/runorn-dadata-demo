@@ -1,4 +1,4 @@
-package com.example.runorn_dadata_demo.model;
+package com.example.runorn_dadata_demo.model.entity;
 
 
 import jakarta.persistence.*;
@@ -26,17 +26,7 @@ public class User {
   @Column(name = "created_at", nullable = false)
   private LocalDate created;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Address> addresses;
-
-  public User(String login, LocalDate created) {
-    this.login = login;
-    this.created = created;
-  }
-  public User(String login, LocalDate created, List<Address> addresses) {
-    this.login = login;
-    this.created = created;
-    this.addresses = addresses;
-  }
 
 }

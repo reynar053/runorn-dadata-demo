@@ -1,6 +1,6 @@
 package com.example.runorn_dadata_demo.controller;
 
-import com.example.runorn_dadata_demo.model.User;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package com.example.runorn_dadata_demo.http;
 
-import com.example.runorn_dadata_demo.model.AddressResponse;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import io.netty.handler.logging.LogLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class DaDataClient {
         .baseUrl(cleanerUri)
         .build();
   }
-  public List<AddressResponse> sendRequest(String address) {
+  public List<DaDataApiResponse> sendRequest(String address) {
 
     return webClient.post()
         .uri("")
@@ -51,7 +51,7 @@ public class DaDataClient {
         .acceptCharset(StandardCharsets.UTF_8)
         .body(BodyInserters.fromValue(List.of(address)))
         .retrieve()
-        .bodyToFlux(AddressResponse.class)
+        .bodyToFlux(DaDataApiResponse.class)
         .collectList()
         .block();
   }

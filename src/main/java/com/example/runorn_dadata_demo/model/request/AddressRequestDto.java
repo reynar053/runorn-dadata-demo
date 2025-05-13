@@ -1,4 +1,4 @@
-package com.example.runorn_dadata_demo.model;
+package com.example.runorn_dadata_demo.model.request;
 
 import lombok.Data;
 

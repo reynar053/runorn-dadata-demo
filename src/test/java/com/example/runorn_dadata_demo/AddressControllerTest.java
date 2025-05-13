@@ -1,11 +1,11 @@
 package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.controller.AddressController;
-import com.example.runorn_dadata_demo.model.AddressRequestDto;
-import com.example.runorn_dadata_demo.model.AddressResponse;
-import com.example.runorn_dadata_demo.model.AddressResponseDto;
-import com.example.runorn_dadata_demo.model.User;
-import com.example.runorn_dadata_demo.service.DaDataService;
+import com.example.runorn_dadata_demo.model.request.AddressRequestDto;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
+import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
+import com.example.runorn_dadata_demo.model.entity.User;
+import com.example.runorn_dadata_demo.service.AddressService;
 import com.example.runorn_dadata_demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class AddressControllerTest {
   private MockMvc mockMvc;
 
   @Mock
-  private DaDataService daDataService;
+  private AddressService addressService;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -55,7 +55,9 @@ class AddressControllerTest {
   void setup() {
     mockMvc = MockMvcBuilders.standaloneSetup(addressController).build();
 
-    User fakeUser = new User("test-user", LocalDate.now());
+    User fakeUser = new User();
+    fakeUser.setLogin("test-user");
+    fakeUser.setCreated(LocalDate.now());
     fakeUser.setId(1L);
     fakeUser.setAddresses(Collections.emptyList());
 
@@ -69,15 +71,15 @@ class AddressControllerTest {
     addressRequestDto.setStreet("сухонска 11");
     addressRequestDto.setApartment("89");
 
-    AddressResponse addressResponse = new AddressResponse();
-    addressResponse.setSource("мск сухонска 11 89");
-    addressResponse.setCountry("Россия");
-    addressResponse.setPostalCode("127642");
-    addressResponse.setRegion("Москва");
-    addressResponse.setRegionType("г");
-    addressResponse.setQc("0");
+    DaDataApiResponse daDataApiResponse = new DaDataApiResponse();
+    daDataApiResponse.setSource("мск сухонска 11 89");
+    daDataApiResponse.setCountry("Россия");
+    daDataApiResponse.setPostalCode("127642");
+    daDataApiResponse.setRegion("Москва");
+    daDataApiResponse.setRegionType("г");
+    daDataApiResponse.setQc("0");
 
-    when(daDataService.cleanAddress("мск сухонска 11 89", "test-user")).thenReturn(addressResponse);
+    when(addressService.cleanAddress("мск сухонска 11 89", "test-user")).thenReturn(daDataApiResponse);
 
 
     mockMvc.perform(post(URL_CLEAN_PATH)
@@ -92,18 +94,18 @@ class AddressControllerTest {
         .andExpect(jsonPath("$.region_type").value("г"))
         .andExpect(jsonPath("$.qc").value("0"));
 
-    verify(daDataService,times(1))
+    verify(addressService,times(1))
         .cleanAddress("мск сухонска 11 89", "test-user");
   }
 
   @Test
   void getAddressByIdTest() throws Throwable {
-    when(daDataService.getAddressById(1L)).thenReturn(addressResponseDto);
+    when(addressService.getAddressById(1L)).thenReturn(addressResponseDto);
 
     AddressResponseDto testShortResponse = addressController.getAddressById(1L);
     assertNotNull(testShortResponse);
     assertEquals(addressResponseDto, testShortResponse);
-    verify(daDataService, times(1)).getAddressById(1L);
+    verify(addressService, times(1)).getAddressById(1L);
   }
 
   @Test

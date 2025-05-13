@@ -1,8 +1,9 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.Address;
-import com.example.runorn_dadata_demo.model.AddressResponse;
-import com.example.runorn_dadata_demo.model.User;
+import com.example.runorn_dadata_demo.model.AddressDBMapper;
+import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.repository.AddressRepository;
 import com.example.runorn_dadata_demo.repository.AddressSaverDBImpl;
 import com.example.runorn_dadata_demo.service.UserService;
@@ -14,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,18 +32,18 @@ class AddressSaverDBImplTest {
   @InjectMocks
   private AddressSaverDBImpl addressSaver;
 
-  private AddressResponse addressResponse;
+  private DaDataApiResponse daDataApiResponse;
   private User mockUser;
 
   @BeforeEach
   void setUp() {
-    addressResponse = new AddressResponse();
-    addressResponse.setCountry("Россия");
-    addressResponse.setQc("0");
-    addressResponse.setRegion("Москва");
-    addressResponse.setPostalCode("127642");
-    addressResponse.setSource("мск сухонска 11 89");
-    addressResponse.setRegionType("г");
+    daDataApiResponse = new DaDataApiResponse();
+    daDataApiResponse.setCountry("Россия");
+    daDataApiResponse.setQc("0");
+    daDataApiResponse.setRegion("Москва");
+    daDataApiResponse.setPostalCode("127642");
+    daDataApiResponse.setSource("мск сухонска 11 89");
+    daDataApiResponse.setRegionType("г");
 
     mockUser = new User();
     mockUser.setLogin("testLogin");
@@ -53,7 +53,7 @@ class AddressSaverDBImplTest {
   void testSaveFirstAddress_shouldSaveMappedAddress() {
     when(userService.createUser("testLogin")).thenReturn(mockUser);
 
-    addressSaver.saveFirstAddress(List.of(addressResponse), "testLogin");
+    addressSaver.saveFirstAddress(AddressDBMapper.toDtoDaDAta(daDataApiResponse));
 
     ArgumentCaptor<Address> captor = ArgumentCaptor.forClass(Address.class);
     verify(addressRepository, times(1)).save(captor.capture());
