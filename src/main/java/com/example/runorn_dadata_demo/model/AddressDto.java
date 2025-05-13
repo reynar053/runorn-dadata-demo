@@ -1,6 +1,5 @@
 package com.example.runorn_dadata_demo.model;
 
-import com.example.runorn_dadata_demo.model.entity.Address;
 import lombok.Data;
 
 import java.time.LocalDateTime;

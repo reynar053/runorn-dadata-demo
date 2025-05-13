@@ -26,7 +26,7 @@ public class OrderController {
   }
 
   @GetMapping
-  public ResponseEntity<List<OrderDto>> getAllOrders(@RequestParam(value = "username", required = true) String username) {
+  public ResponseEntity<List<OrderDto>> getAllOrders(@RequestParam(value = "username") String username) {
     return ResponseEntity.ok(orderService.findOrdersByUsername(username));
   }
 

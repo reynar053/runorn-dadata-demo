@@ -3,13 +3,11 @@ package com.example.runorn_dadata_demo.model;
 import com.example.runorn_dadata_demo.model.entity.Order;
 import com.example.runorn_dadata_demo.model.entity.OrderItem;
 import com.example.runorn_dadata_demo.model.entity.OrderStatus;
-import com.example.runorn_dadata_demo.model.request.OrderItemRequest;
 import com.example.runorn_dadata_demo.model.request.OrderRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {

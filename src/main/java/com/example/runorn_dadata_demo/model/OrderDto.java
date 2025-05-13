@@ -1,6 +1,5 @@
 package com.example.runorn_dadata_demo.model;
 
-import com.example.runorn_dadata_demo.model.entity.OrderItem;
 import com.example.runorn_dadata_demo.model.entity.OrderStatus;
 import lombok.Data;
 

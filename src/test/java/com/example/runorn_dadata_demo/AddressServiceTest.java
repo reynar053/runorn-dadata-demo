@@ -7,6 +7,7 @@ import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
 import com.example.runorn_dadata_demo.model.response.AddressResponseMapper;
 import com.example.runorn_dadata_demo.repository.AddressSaverDBImpl;
 import com.example.runorn_dadata_demo.service.AddressService;
+import com.example.runorn_dadata_demo.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,8 @@ public class AddressServiceTest {
   private AddressSaverDBImpl addressSaverDBImpl;
   @Mock
   private DaDataClient daDataClient;
-
+  @Mock
+  private UserService userService;
   @BeforeEach
   void setUp() {
 
