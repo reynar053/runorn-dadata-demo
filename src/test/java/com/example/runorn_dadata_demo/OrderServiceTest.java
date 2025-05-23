@@ -5,10 +5,13 @@ import com.example.runorn_dadata_demo.model.*;
 import com.example.runorn_dadata_demo.model.entity.*;
 import com.example.runorn_dadata_demo.model.request.OrderItemRequest;
 import com.example.runorn_dadata_demo.model.request.OrderRequest;
-import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import com.example.runorn_dadata_demo.repository.*;
+import com.example.runorn_dadata_demo.service.AddressService;
 import com.example.runorn_dadata_demo.service.OrderService;
 import com.example.runorn_dadata_demo.service.UserService;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,11 +47,19 @@ public class OrderServiceTest {
     @Mock
     private AddressSaver addressSaver;
 
+    @Mock
+    private AddressService addressService;
+
     private OrderService orderService;
+    private Validator validator;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(orderItemRepository, orderRepository, userService, daDataClient, addressSaver);
+        orderService = new OrderService(orderItemRepository, orderRepository, userService, daDataClient,
+            addressSaver, addressService);
+        
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
@@ -60,7 +72,6 @@ public class OrderServiceTest {
         user.setLogin(username);
         user.setCreated(LocalDate.now());
 
-        DaDataApiResponse daDataApiResponse = new DaDataApiResponse();
         Address address = new Address();
         address.setId(1L);
         address.setUser(user);
@@ -83,7 +94,7 @@ public class OrderServiceTest {
         order.setStatus(OrderStatus.CREATED);
 
         when(userService.getUserByLogin(username)).thenReturn(user);
-        when(daDataClient.sendRequest(rawAddress)).thenReturn(List.of(daDataApiResponse));
+        when(addressService.createAddressWithDaData(rawAddress)).thenReturn(address);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(orderItemRepository.saveAll(any())).thenReturn(new ArrayList<>());
 
@@ -96,7 +107,7 @@ public class OrderServiceTest {
         assertEquals(1, result.getOrderItems().size());
 
         verify(userService).getUserByLogin(username);
-        verify(daDataClient).sendRequest(rawAddress);
+        verify(addressService).createAddressWithDaData(rawAddress);
         verify(orderRepository).save(any(Order.class));
         verify(orderItemRepository).saveAll(any());
         verify(addressSaver).saveFirstAddress(any(Address.class));
@@ -157,7 +168,7 @@ public class OrderServiceTest {
 
         assertThrows(RuntimeException.class, () -> orderService.createOrder(orderRequest));
         verify(userService).getUserByLogin(username);
-        verifyNoInteractions(daDataClient, orderRepository, orderItemRepository, addressSaver);
+        verifyNoInteractions(addressService, orderRepository, orderItemRepository, addressSaver);
     }
 
     @Test
@@ -173,49 +184,26 @@ public class OrderServiceTest {
     }
 
     @Test
-    void createOrder_shouldThrowException_whenUsernameIsEmpty() {
+    void validateOrderRequest_whenInvalid() {
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setUsername("");
-        orderRequest.setRawAddress("Moscow, Red Square 1");
-        orderRequest.setItems(List.of(new OrderItemRequest()));
+        // Empty request will fail all validations
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> orderService.createOrder(orderRequest));
-        assertEquals("Username cannot be empty", exception.getMessage());
-        verifyNoInteractions(userService, daDataClient, orderRepository, orderItemRepository, addressSaver);
+        Set<jakarta.validation.ConstraintViolation<OrderRequest>> violations = validator.validate(orderRequest);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Username cannot be empty")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Address cannot be empty")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Order must contain at least one item")));
     }
 
     @Test
-    void createOrder_shouldThrowException_whenAddressIsEmpty() {
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setUsername("testUser");
-        orderRequest.setRawAddress("");
-        orderRequest.setItems(List.of(new OrderItemRequest()));
+    void validateOrderItemRequest_whenInvalid() {
+        OrderItemRequest itemRequest = new OrderItemRequest();
+        // Empty request will fail all validations
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> orderService.createOrder(orderRequest));
-        assertEquals("Address cannot be empty", exception.getMessage());
-        verifyNoInteractions(userService, daDataClient, orderRepository, orderItemRepository, addressSaver);
-    }
-
-    @Test
-    void createOrder_shouldThrowException_whenItemsIsEmpty() {
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setUsername("testUser");
-        orderRequest.setRawAddress("Moscow, Red Square 1");
-        orderRequest.setItems(List.of());
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> orderService.createOrder(orderRequest));
-        assertEquals("Order must contain at least one item", exception.getMessage());
-        verifyNoInteractions(userService, daDataClient, orderRepository, orderItemRepository, addressSaver);
-    }
-
-    @Test
-    void findOrdersByUsername_shouldThrowException_whenUsernameIsEmpty() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
-            () -> orderService.findOrdersByUsername(""));
-        assertEquals("Username cannot be empty", exception.getMessage());
-        verifyNoInteractions(userService, orderRepository);
+        Set<jakarta.validation.ConstraintViolation<OrderItemRequest>> violations = validator.validate(itemRequest);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Product name cannot be empty")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Quantity must be positive")));
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Price must be positive")));
     }
 }

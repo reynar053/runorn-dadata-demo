@@ -1,8 +1,8 @@
 package com.example.runorn_dadata_demo;
 
+import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
+import com.example.runorn_dadata_demo.model.AddressDto;
 import com.example.runorn_dadata_demo.model.entity.Address;
-import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
-import com.example.runorn_dadata_demo.model.response.AddressResponseMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +17,7 @@ public class DaDataApiResponseMapperTest {
     address.setCountry("Россия");
     address.setPostalCode("127642");
 
-    AddressResponseDto dto = AddressResponseMapper.toDto(address);
+    AddressDto dto = AddressDBMapper.toDto(address);
 
     assertNotNull(dto);
     assertEquals(address.getSource(), dto.getSource());

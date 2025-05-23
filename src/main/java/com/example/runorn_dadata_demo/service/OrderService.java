@@ -1,11 +1,18 @@
 package com.example.runorn_dadata_demo.service;
 
 import com.example.runorn_dadata_demo.http.DaDataClient;
+import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
+import com.example.runorn_dadata_demo.mapper.OrderMapper;
+import com.example.runorn_dadata_demo.mapper.UserMapper;
 import com.example.runorn_dadata_demo.model.*;
 import com.example.runorn_dadata_demo.model.entity.*;
+import com.example.runorn_dadata_demo.model.factory.AddressFactory;
+import com.example.runorn_dadata_demo.model.factory.OrderFactory;
 import com.example.runorn_dadata_demo.model.request.OrderRequest;
 import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import com.example.runorn_dadata_demo.repository.*;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class OrderService {
     private final OrderItemRepository orderItemRepository;
@@ -21,64 +29,49 @@ public class OrderService {
     private final UserService userService;
     private final DaDataClient daDataClient;
     private final AddressSaver addressSaver;
+    private final AddressService addressService;
 
-    public OrderService(OrderItemRepository orderItemRepository, OrderRepository orderRepository, UserService userService,
-                       DaDataClient daDataClient, @Qualifier("addressDB") AddressSaver addressSaver) {
+    public OrderService(OrderItemRepository orderItemRepository, OrderRepository orderRepository,
+                        UserService userService, DaDataClient daDataClient,
+                        @Qualifier("addressDB") AddressSaver addressSaver, AddressService addressService) {
         this.orderItemRepository = orderItemRepository;
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.daDataClient = daDataClient;
         this.addressSaver = addressSaver;
+      this.addressService = addressService;
     }
 
     @Transactional
-    public OrderDto createOrder(OrderRequest orderRequest) {
-        if (orderRequest == null) {
-            throw new IllegalArgumentException("Order request cannot be null");
-        }
-        if (!StringUtils.hasText(orderRequest.getUsername())) {
-            throw new IllegalArgumentException("Username cannot be empty");
-        }
-        if (!StringUtils.hasText(orderRequest.getRawAddress())) {
-            throw new IllegalArgumentException("Address cannot be empty");
-        }
-        if (orderRequest.getItems() == null || orderRequest.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Order must contain at least one item");
-        }
+    public OrderDto createOrder(@Valid OrderRequest orderRequest) {
+        log.info("Creating new order for user: {}", orderRequest.getUsername());
         
         User user = userService.getUserByLogin(orderRequest.getUsername());
-        UserDto userDto = UserMapper.toDto(user);
+        log.debug("Found user: {}", user.getLogin());
 
-        List<DaDataApiResponse> daDataApiResponseList = daDataClient.sendRequest(orderRequest.getRawAddress());
-        DaDataApiResponse daDataApiResponse = daDataApiResponseList.get(0);
-        Address address = AddressDBMapper.toDtoDaDAta(daDataApiResponse);
+        Address address = addressService.createAddressWithDaData(orderRequest.getRawAddress());
         address.setUser(user);
         addressSaver.saveFirstAddress(address);
-        AddressDto addressDto = AddressDBMapper.toDto(address);
-        addressDto.setUser(userDto);
+        log.debug("Created and saved address: {}", address.getSource());
 
-        Order order = OrderMapper.toOrder(orderRequest);
-        order.setUser(user);
-        order.setShippingAddress(address);
+        Order order = OrderFactory.createOrder(orderRequest, user, address);
+        order.setStatus(OrderStatus.CREATED);
         orderRepository.save(order);
         orderItemRepository.saveAll(order.getItems());
+        log.info("Order created successfully with id: {}", order.getId());
 
-        OrderDto orderDto = OrderMapper.toDto(order);
-        orderDto.setUser(userDto);
-        orderDto.setAddress(addressDto);
-
-        return orderDto;
+        return OrderMapper.toDto(order);
     }
 
     @Transactional(readOnly = true)
     public List<OrderDto> findOrdersByUsername(String username) {
-        if (!StringUtils.hasText(username)) {
-            throw new IllegalArgumentException("Username cannot be empty");
-        }
+        log.info("Finding orders for user: {}", username);
         
         User user = userService.getUserByLogin(username);
         UserDto userDto = UserMapper.toDto(user);
         List<Order> orders = orderRepository.findByUserIdWithDetails(user.getId());
+        log.debug("Found {} orders for user: {}", orders.size(), username);
+        
         return orders.stream().map(order -> {
             Address address = order.getShippingAddress();
             AddressDto addressDto = AddressDBMapper.toDto(address);

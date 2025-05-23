@@ -1,10 +1,10 @@
 package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.http.DaDataClient;
+import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
+import com.example.runorn_dadata_demo.model.AddressDto;
 import com.example.runorn_dadata_demo.model.entity.Address;
 import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
-import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
-import com.example.runorn_dadata_demo.model.response.AddressResponseMapper;
 import com.example.runorn_dadata_demo.repository.AddressSaverDBImpl;
 import com.example.runorn_dadata_demo.service.AddressService;
 import com.example.runorn_dadata_demo.service.UserService;
@@ -56,7 +56,7 @@ public class AddressServiceTest {
 
     when(daDataClient.sendRequest(anyString())).thenReturn(daDataApiResponsesList);
 
-    DaDataApiResponse result = addressService.cleanAddress("мск сухонска 11 89", "pivo");
+    Address result = addressService.cleanAddress("мск сухонска 11 89", "pivo");
     assertNotNull(result);
     assertEquals("мск сухонска 11 89", result.getSource());
     assertEquals("Россия", result.getCountry());
@@ -81,10 +81,10 @@ public class AddressServiceTest {
   @Test
   void getAddressByIdTest() throws Throwable {
     Address addressResponse = new Address();
-    AddressResponseDto expectedDto = AddressResponseMapper.toDto(addressResponse);
+    AddressDto expectedDto = AddressDBMapper.toDto(addressResponse);
 
     when(addressSaverDBImpl.getAddressById(1L)).thenReturn(Optional.of(addressResponse));
-    AddressResponseDto result = addressService.getAddressById(1L);
+    AddressDto result = addressService.getAddressById(1L);
 
     assertNotNull(result);
     assertEquals(expectedDto, result);
