@@ -1,22 +1,21 @@
 package com.example.runorn_dadata_demo.service;
 
 import com.example.runorn_dadata_demo.http.DaDataClient;
-import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
 import com.example.runorn_dadata_demo.mapper.OrderMapper;
-import com.example.runorn_dadata_demo.mapper.UserMapper;
-import com.example.runorn_dadata_demo.model.*;
-import com.example.runorn_dadata_demo.model.entity.*;
-import com.example.runorn_dadata_demo.model.factory.AddressFactory;
+import com.example.runorn_dadata_demo.model.OrderDto;
+import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.entity.Order;
+import com.example.runorn_dadata_demo.model.entity.OrderStatus;
+import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.model.factory.OrderFactory;
 import com.example.runorn_dadata_demo.model.request.OrderRequest;
-import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
-import com.example.runorn_dadata_demo.repository.*;
-import jakarta.validation.Valid;
+import com.example.runorn_dadata_demo.repository.AddressSaver;
+import com.example.runorn_dadata_demo.repository.OrderItemRepository;
+import com.example.runorn_dadata_demo.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +42,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDto createOrder(@Valid OrderRequest orderRequest) {
+    public OrderDto createOrder(OrderRequest orderRequest) {
         log.info("Creating new order for user: {}", orderRequest.getUsername());
         
         User user = userService.getUserByLogin(orderRequest.getUsername());
@@ -68,20 +67,9 @@ public class OrderService {
         log.info("Finding orders for user: {}", username);
         
         User user = userService.getUserByLogin(username);
-        UserDto userDto = UserMapper.toDto(user);
         List<Order> orders = orderRepository.findByUserIdWithDetails(user.getId());
         log.debug("Found {} orders for user: {}", orders.size(), username);
         
-        return orders.stream().map(order -> {
-            Address address = order.getShippingAddress();
-            AddressDto addressDto = AddressDBMapper.toDto(address);
-            addressDto.setUser(userDto);
-
-            OrderDto orderDto = OrderMapper.toDto(order);
-            orderDto.setUser(userDto);
-            orderDto.setAddress(addressDto);
-
-            return orderDto;
-        }).collect(Collectors.toList());
+        return orders.stream().map(OrderMapper::toDto).collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package com.example.runorn_dadata_demo.controller;
 import com.example.runorn_dadata_demo.model.OrderDto;
 import com.example.runorn_dadata_demo.model.request.OrderRequest;
 import com.example.runorn_dadata_demo.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class OrderController {
   }
 
   @PostMapping
-  public ResponseEntity<OrderDto> createOrder(@RequestBody OrderRequest orderRequest) {
+  public ResponseEntity<OrderDto> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
     return ResponseEntity.ok(orderService.createOrder(orderRequest));
   }
 
