@@ -1,7 +1,8 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.AddressDBMapper;
+import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
 import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.factory.AddressFactory;
 import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import com.example.runorn_dadata_demo.repository.AddressSaverImpl;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class AddressSaverImplTest {
 
   @Test
   void saveFirstAddressTest() {
-    addressSaver.saveFirstAddress(AddressDBMapper.toDtoDaDAta(daDataApiResponse));
+    addressSaver.saveFirstAddress(AddressFactory.createAddress(daDataApiResponse));
     assertEquals(1, addressMap.size());
   }
 
@@ -51,7 +52,7 @@ public class AddressSaverImplTest {
     address.setRegionType("г");
     address.setQc("0");
 
-    addressSaver.saveFirstAddress(AddressDBMapper.toDtoDaDAta(address));
+    addressSaver.saveFirstAddress(AddressFactory.createAddress(address));
 
     Optional<Address> result = addressSaver.getAddressById(1L);
 

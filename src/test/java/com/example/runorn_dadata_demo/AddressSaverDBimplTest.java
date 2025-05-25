@@ -1,7 +1,8 @@
 package com.example.runorn_dadata_demo;
 
-import com.example.runorn_dadata_demo.model.AddressDBMapper;
+import com.example.runorn_dadata_demo.mapper.AddressDBMapper;
 import com.example.runorn_dadata_demo.model.entity.Address;
+import com.example.runorn_dadata_demo.model.factory.AddressFactory;
 import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
 import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.repository.AddressRepository;
@@ -53,7 +54,7 @@ class AddressSaverDBImplTest {
   void testSaveFirstAddress_shouldSaveMappedAddress() {
     when(userService.createUser("testLogin")).thenReturn(mockUser);
 
-    addressSaver.saveFirstAddress(AddressDBMapper.toDtoDaDAta(daDataApiResponse));
+    addressSaver.saveFirstAddress(AddressFactory.createAddress(daDataApiResponse));
 
     ArgumentCaptor<Address> captor = ArgumentCaptor.forClass(Address.class);
     verify(addressRepository, times(1)).save(captor.capture());

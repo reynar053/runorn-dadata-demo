@@ -1,9 +1,9 @@
 package com.example.runorn_dadata_demo;
 
 import com.example.runorn_dadata_demo.controller.AddressController;
+import com.example.runorn_dadata_demo.model.AddressDto;
 import com.example.runorn_dadata_demo.model.request.AddressRequestDto;
 import com.example.runorn_dadata_demo.model.response.DaDataApiResponse;
-import com.example.runorn_dadata_demo.model.response.AddressResponseDto;
 import com.example.runorn_dadata_demo.model.entity.User;
 import com.example.runorn_dadata_demo.service.AddressService;
 import com.example.runorn_dadata_demo.service.UserService;
@@ -46,7 +46,7 @@ class AddressControllerTest {
   private UserService userService;
 
   @Mock
-  private AddressResponseDto addressResponseDto;
+  private AddressDto addressDto;
 
   @InjectMocks
   private AddressController addressController;
@@ -79,7 +79,7 @@ class AddressControllerTest {
     daDataApiResponse.setRegionType("г");
     daDataApiResponse.setQc("0");
 
-    when(addressService.cleanAddress("мск сухонска 11 89", "test-user")).thenReturn(daDataApiResponse);
+    when(addressService.cleanAddress("мск сухонска 11 89", "test-user")).thenReturn(any());
 
 
     mockMvc.perform(post(URL_CLEAN_PATH)
@@ -100,11 +100,11 @@ class AddressControllerTest {
 
   @Test
   void getAddressByIdTest() throws Throwable {
-    when(addressService.getAddressById(1L)).thenReturn(addressResponseDto);
+    when(addressService.getAddressById(1L)).thenReturn(addressDto);
 
-    AddressResponseDto testShortResponse = addressController.getAddressById(1L);
+    AddressDto testShortResponse = addressController.getAddressById(1L);
     assertNotNull(testShortResponse);
-    assertEquals(addressResponseDto, testShortResponse);
+    assertEquals(addressDto, testShortResponse);
     verify(addressService, times(1)).getAddressById(1L);
   }
 

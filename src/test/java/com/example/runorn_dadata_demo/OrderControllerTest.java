@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OrderControllerTest {
 
     private MockMvc mockMvc;
-
     private ObjectMapper objectMapper;
 
     @Mock
@@ -42,7 +42,12 @@ public class OrderControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+        
+        mockMvc = MockMvcBuilders.standaloneSetup(orderController)
+                .setValidator(validator)
+                .build();
         objectMapper = new ObjectMapper();
     }
 
@@ -99,15 +104,15 @@ public class OrderControllerTest {
     @Test
     void createOrder_shouldReturnBadRequest_whenInvalidRequest() throws Exception {
         OrderRequest invalidRequest = new OrderRequest();
-
-        when(orderService.createOrder(any(OrderRequest.class)))
-                .thenThrow(new IllegalArgumentException("Username cannot be empty"));
+        // Empty request will fail validation
 
         mockMvc.perform(post("/api/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Username cannot be empty"));
+                .andExpect(jsonPath("$.username").value("Username cannot be empty"))
+                .andExpect(jsonPath("$.rawAddress").value("Address cannot be empty"))
+                .andExpect(jsonPath("$.items").value("Order must contain at least one item"));
     }
 
     @Test
@@ -117,9 +122,10 @@ public class OrderControllerTest {
     }
 
     @Test
-    void createOrder_shouldReturnInternalServerError_whenServiceThrowsException() throws Exception {
+    void shouldReturnInternalServerError_whenServiceThrowsException() throws Exception {
+        String username = "testUser";
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setUsername("testUser");
+        orderRequest.setUsername(username);
         orderRequest.setRawAddress("Moscow, Red Square 1");
         orderRequest.setItems(List.of(new OrderItemRequest()));
 
@@ -131,11 +137,6 @@ public class OrderControllerTest {
                 .content(objectMapper.writeValueAsString(orderRequest)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string("Service error"));
-    }
-
-    @Test
-    void getAllOrders_shouldReturnInternalServerError_whenServiceThrowsException() throws Exception {
-        String username = "testUser";
 
         when(orderService.findOrdersByUsername(username))
                 .thenThrow(new RuntimeException("Service error"));
